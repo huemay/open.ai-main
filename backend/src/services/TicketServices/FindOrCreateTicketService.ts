@@ -20,7 +20,6 @@ const FindOrCreateTicketService = async (
   companyId: number,
   groupContact?: Contact
 ): Promise<Ticket> => {
-  // Tentar encontrar um ticket existente
   let ticket = await Ticket.findOne({
     where: {
       status: {
@@ -40,7 +39,6 @@ const FindOrCreateTicketService = async (
     await ticket.update({ queueId: null, userId: null });
   }
 
-  // Se não encontrar um ticket e existir um groupContact
   if (!ticket && groupContact) {
     ticket = await Ticket.findOne({
       where: {
@@ -64,7 +62,6 @@ const FindOrCreateTicketService = async (
         userId: ticket.userId
       });
     }
-
     const msgIsGroupBlock = await Setting.findOne({
       where: { key: "timeCreateNewTicket" }
     });
@@ -72,12 +69,11 @@ const FindOrCreateTicketService = async (
     const value = msgIsGroupBlock ? parseInt(msgIsGroupBlock.value, 10) : 7200;
   }
 
-  // Se não encontrar um ticket e não existir groupContact
   if (!ticket && !groupContact) {
     ticket = await Ticket.findOne({
       where: {
         updatedAt: {
-          [Op.between]: [subHours(new Date(), 2), new Date()] // Usando objetos Date diretamente
+          [Op.between]: [+subHours(new Date(), 2), +new Date()]
         },
         contactId: contact.id
       },
@@ -100,23 +96,28 @@ const FindOrCreateTicketService = async (
       });
     }
   }
-
-  // Criação de um novo ticket
-  ticket = await Ticket.create({
-    contactId: groupContact ? groupContact.id : contact.id,
-    status: "pending",
-    isGroup: !!groupContact,
-    unreadMessages,
-    whatsappId,
-    companyId
+  
+    const whatsapp = await Whatsapp.findOne({
+    where: { id: whatsappId }
   });
 
-  await FindOrCreateATicketTrakingService({
-    ticketId: ticket.id,
-    companyId,
-    whatsappId,
-    userId: ticket.userId
-  });
+  if (!ticket) {
+    ticket = await Ticket.create({
+      contactId: groupContact ? groupContact.id : contact.id,
+      status: "pending",
+      isGroup: !!groupContact,
+      unreadMessages,
+      whatsappId,
+      whatsapp,
+      companyId
+    });
+    await FindOrCreateATicketTrakingService({
+      ticketId: ticket.id,
+      companyId,
+      whatsappId,
+      userId: ticket.userId
+    });
+  }
 
   ticket = await ShowTicketService(ticket.id, companyId);
 
