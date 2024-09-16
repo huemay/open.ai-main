@@ -131,7 +131,7 @@ const HubMessageListener = async (
     const ticket = await FindOrCreateTicketService(
       contact,
       whatsappId: whatsapp.id!,
-      unreadMessages,
+      unreadMessages
     );
 
     // const ticket = await CreateOrUpdateTicketService({
