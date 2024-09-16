@@ -13,6 +13,7 @@ interface TicketData {
   queueId: number;
   userId: number;
   channel: string;
+  companyId,
 }
 
 export const send = async (req: Request, res: Response): Promise<Response> => {
@@ -72,9 +73,9 @@ export const send = async (req: Request, res: Response): Promise<Response> => {
 };
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
-  const { contactId, status, userId, channel }: TicketData = req.body;
+  const { contactId, status, userId, channel, companyId }: TicketData = req.body;
 
-  const ticket = await CreateHubTicketService({ contactId, status, userId, channel });
+  const ticket = await CreateHubTicketService({ contactId, status, userId, channel, companyId });
 
   const io = getIO();
   io.to(ticket.status).emit("ticket", {

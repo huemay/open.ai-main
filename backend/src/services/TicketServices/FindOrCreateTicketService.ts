@@ -62,6 +62,7 @@ const FindOrCreateTicketService = async (
         userId: ticket.userId
       });
     }
+
     const msgIsGroupBlock = await Setting.findOne({
       where: { key: "timeCreateNewTicket" }
     });
@@ -73,7 +74,7 @@ const FindOrCreateTicketService = async (
     ticket = await Ticket.findOne({
       where: {
         updatedAt: {
-          [Op.between]: [+subHours(new Date(), 2), +new Date()]
+          [Op.between]: [subHours(new Date(), 2), new Date()] // Corrigido para usar datas diretamente
         },
         contactId: contact.id
       },
@@ -96,28 +97,23 @@ const FindOrCreateTicketService = async (
       });
     }
   }
-  
-    const whatsapp = await Whatsapp.findOne({
-    where: { id: whatsappId }
+
+  // Remove o whatsapp desnecessário na criação de ticket
+  ticket = await Ticket.create({
+    contactId: groupContact ? groupContact.id : contact.id,
+    status: "pending",
+    isGroup: !!groupContact,
+    unreadMessages,
+    whatsappId, // Removido o whatsapp, mantendo o whatsappId
+    companyId
   });
 
-  if (!ticket) {
-    ticket = await Ticket.create({
-      contactId: groupContact ? groupContact.id : contact.id,
-      status: "pending",
-      isGroup: !!groupContact,
-      unreadMessages,
-      whatsappId,
-      whatsapp,
-      companyId
-    });
-    await FindOrCreateATicketTrakingService({
-      ticketId: ticket.id,
-      companyId,
-      whatsappId,
-      userId: ticket.userId
-    });
-  }
+  await FindOrCreateATicketTrakingService({
+    ticketId: ticket.id,
+    companyId,
+    whatsappId,
+    userId: ticket.userId
+  });
 
   ticket = await ShowTicketService(ticket.id, companyId);
 

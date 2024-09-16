@@ -1,9 +1,15 @@
 import AppError from "../../errors/AppError";
 import CheckContactOpenTickets from "../../helpers/CheckContactOpenTickets";
+import GetDefaultWhatsApp from "../../helpers/GetDefaultWhatsApp";
 import Ticket from "../../models/Ticket";
+import ShowContactService from "../ContactServices/ShowContactService";
 import User from "../../models/User";
+import { getIO } from "../../libs/socket";
 import Whatsapp from "../../models/Whatsapp";
 import ShowContactService from "../ContactServices/ShowContactService";
+import GetDefaultWhatsAppByUser from "../../helpers/GetDefaultWhatsAppByUser";
+import ShowWhatsAppService from "../WhatsappService/ShowWhatsAppService";
+
 
 interface Request {
   contactId: number;
