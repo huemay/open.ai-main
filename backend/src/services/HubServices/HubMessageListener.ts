@@ -79,16 +79,17 @@ const verifySentMessageStatus = (message: HubConfirmationSentMessage) => {
 const HubMessageListener = async (
   message: any | HubInMessage | HubConfirmationSentMessage,
   whatsapp: Whatsapp,
-  medias: Express.Multer.File[]
+  medias: Express.Multer.File[],
+  companyId: number // adicionei companyId como argumento
 ) => {
   console.log("HubMessageListener", message);
   console.log("contents", message.message.contents);
 
-  if(message.direction === 'IN'){
-    message.fromMe = false
+  if (message.direction === 'IN') {
+    message.fromMe = false;
   }
 
-  const ignoreEvent = message.direction === 'OUT'
+  const ignoreEvent = message.direction === 'OUT';
   if (ignoreEvent) {
     return;
   }
@@ -126,20 +127,14 @@ const HubMessageListener = async (
       channel
     });
 
-    const unreadMessages = 1
+    const unreadMessages = 1;
 
     const ticket = await FindOrCreateTicketService(
       contact,
       whatsapp.id!,
-      unreadMessages
+      unreadMessages,
+      companyId // passando o companyId
     );
-
-    // const ticket = await CreateOrUpdateTicketService({
-    //   contactId: contact.id,
-    //   channel,
-    //   contents,
-    //   whatsapp
-    // });
 
     if (contents[0]?.type === "text") {
       await CreateMessageService({
@@ -164,7 +159,6 @@ const HubMessageListener = async (
           originalName: media.originalname
         });
       }
-
     }
   } catch (error: any) {
     console.log(error);

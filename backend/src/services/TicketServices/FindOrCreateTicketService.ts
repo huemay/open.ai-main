@@ -20,6 +20,7 @@ const FindOrCreateTicketService = async (
   companyId: number,
   groupContact?: Contact
 ): Promise<Ticket> => {
+  // Tentar encontrar um ticket existente
   let ticket = await Ticket.findOne({
     where: {
       status: {
@@ -39,6 +40,7 @@ const FindOrCreateTicketService = async (
     await ticket.update({ queueId: null, userId: null });
   }
 
+  // Se não encontrar um ticket e existir um groupContact
   if (!ticket && groupContact) {
     ticket = await Ticket.findOne({
       where: {
@@ -70,11 +72,12 @@ const FindOrCreateTicketService = async (
     const value = msgIsGroupBlock ? parseInt(msgIsGroupBlock.value, 10) : 7200;
   }
 
+  // Se não encontrar um ticket e não existir groupContact
   if (!ticket && !groupContact) {
     ticket = await Ticket.findOne({
       where: {
         updatedAt: {
-          [Op.between]: [subHours(new Date(), 2), new Date()] // Corrigido para usar datas diretamente
+          [Op.between]: [subHours(new Date(), 2).toISOString(), new Date().toISOString()] // Usando toISOString para converter datas
         },
         contactId: contact.id
       },
@@ -98,13 +101,13 @@ const FindOrCreateTicketService = async (
     }
   }
 
-  // Remove o whatsapp desnecessário na criação de ticket
+  // Criação de um novo ticket
   ticket = await Ticket.create({
     contactId: groupContact ? groupContact.id : contact.id,
     status: "pending",
     isGroup: !!groupContact,
     unreadMessages,
-    whatsappId, // Removido o whatsapp, mantendo o whatsappId
+    whatsappId,
     companyId
   });
 
