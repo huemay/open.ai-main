@@ -10,6 +10,7 @@ interface Request {
   status: string;
   userId: number;
   queueId ?: number;
+  companyId: number;
   channel: string;
 }
 
@@ -18,6 +19,7 @@ const CreateTicketService = async ({
   status,
   userId,
   queueId,
+  companyId,
   channel
 }: Request): Promise<Ticket> => {
 
@@ -38,9 +40,9 @@ const CreateTicketService = async ({
     throw new Error("Connection id not found");
   }
 
-  await CheckContactOpenTickets(contactId, connection.id);
+  await CheckContactOpenTickets(contactId);
 
-  const { isGroup } = await ShowContactService(contactId);
+  const { isGroup } = await ShowContactService(contactId, companyId);
 
   if(queueId === undefined) {
     const user = await User.findByPk(userId, { include: ["queues"]});

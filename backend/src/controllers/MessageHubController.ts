@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import Contact from "../models/Contact";
 import Ticket from "../models/Ticket";
-import { SendTextMessageService } from "../services/HubServices/SendTextMessageHubService";
+import { SendTextMessageService } from "../services/HubServices//SendTextMessageHubService";
 import Whatsapp from "../models/Whatsapp";
 import { SendMediaMessageService } from "../services/HubServices/SendMediaMessageHubService";
 import CreateHubTicketService from "../services/HubServices/CreateHubTicketService";

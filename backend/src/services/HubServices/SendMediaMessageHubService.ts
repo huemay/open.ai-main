@@ -129,4 +129,3 @@ export const SendMediaMessageService = async (
     console.log("Error:", error);
   }
 };
-backend\src\services\HubServices\SendTextMessageHubService.t
