@@ -77,7 +77,7 @@ const FindOrCreateTicketService = async (
     ticket = await Ticket.findOne({
       where: {
         updatedAt: {
-          [Op.between]: [subHours(new Date(), 2).toISOString(), new Date().toISOString()] // Usando toISOString para converter datas
+          [Op.between]: [subHours(new Date(), 2), new Date()] // Usando objetos Date diretamente
         },
         contactId: contact.id
       },

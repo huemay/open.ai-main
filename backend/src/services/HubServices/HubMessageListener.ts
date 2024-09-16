@@ -80,7 +80,7 @@ const HubMessageListener = async (
   message: any | HubInMessage | HubConfirmationSentMessage,
   whatsapp: Whatsapp,
   medias: Express.Multer.File[],
-  companyId: number // adicionei companyId como argumento
+  companyId: number
 ) => {
   console.log("HubMessageListener", message);
   console.log("contents", message.message.contents);

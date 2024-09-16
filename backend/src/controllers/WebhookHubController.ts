@@ -19,10 +19,13 @@ export const listen = async (
   }
 
   try {
-    await HubMessageListener(req.body, connection, medias);
+    // Supondo que o quarto argumento seja algo como userId
+    const userId = "someUserId"; // Ajuste conforme necessário
+
+    await HubMessageListener(req.body, connection, medias, userId);
 
     return res.status(200).json({ message: "Webhook received" });
   } catch (error) {
-    return res.status(400).json({ message: error });
+    return res.status(400).json({ message: error.message || error });
   }
 };
